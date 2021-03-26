@@ -48,6 +48,8 @@ interface MutationStoreValue {
   error: Error | null;
 }
 
+type MutationResult<TData> = Omit<FetchResult<TData>, 'context'>;
+
 export class QueryManager<TStore> {
   public cache: ApolloCache<TStore>;
   public link: ApolloLink;
@@ -167,6 +169,7 @@ export class QueryManager<TStore> {
         document: mutation,
         variables,
         errorPolicy,
+        context,
         updateQueries,
         update: updateWithProxyFn,
       });
@@ -210,6 +213,7 @@ export class QueryManager<TStore> {
                 document: mutation,
                 variables,
                 errorPolicy,
+                context,
                 updateQueries,
                 update: updateWithProxyFn,
               });
@@ -318,10 +322,15 @@ export class QueryManager<TStore> {
       document: DocumentNode;
       variables?: OperationVariables;
       errorPolicy: ErrorPolicy;
+      context: Record<string, any>;
       updateQueries: MutationOptions<TData>["updateQueries"],
       update?: (
         cache: ApolloCache<TStore>,
-        result: FetchResult<TData>,
+        result: MutationResult<TData>,
+        options: {
+          context?: Record<string, any>,
+          variables?: OperationVariables,
+        },
       ) => void;
     },
     cache = this.cache,
@@ -381,7 +390,10 @@ export class QueryManager<TStore> {
         // write action.
         const { update } = mutation;
         if (update) {
-          update(c, mutation.result);
+          update(c, mutation.result, {
+            context: mutation.context,
+            variables: mutation.variables,
+          });
         }
       }, /* non-optimistic transaction: */ null);
     }
@@ -394,10 +406,11 @@ export class QueryManager<TStore> {
       document: DocumentNode;
       variables?: OperationVariables;
       errorPolicy: ErrorPolicy;
+      context: Record<string, any>;
       updateQueries: MutationOptions<TData>["updateQueries"],
       update?: (
         cache: ApolloCache<TStore>,
-        result: FetchResult<TData>,
+        result: MutationResult<TData>
       ) => void;
     },
   ) {
