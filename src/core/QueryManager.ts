@@ -49,6 +49,10 @@ interface MutationStoreValue {
 }
 
 type MutationResult<TData> = Omit<FetchResult<TData>, 'context'>;
+interface MutationResultOptions {
+  context?: Record<string, any>,
+  variables?: OperationVariables,
+}
 
 export class QueryManager<TStore> {
   public cache: ApolloCache<TStore>;
@@ -133,7 +137,7 @@ export class QueryManager<TStore> {
     update: updateWithProxyFn,
     errorPolicy = 'none',
     fetchPolicy,
-    context = {},
+    context,
   }: MutationOptions): Promise<FetchResult<T>> {
     invariant(
       mutation,
@@ -327,10 +331,7 @@ export class QueryManager<TStore> {
       update?: (
         cache: ApolloCache<TStore>,
         result: MutationResult<TData>,
-        options: {
-          context?: Record<string, any>,
-          variables?: OperationVariables,
-        },
+        options: MutationResultOptions,
       ) => void;
     },
     cache = this.cache,
@@ -410,7 +411,8 @@ export class QueryManager<TStore> {
       updateQueries: MutationOptions<TData>["updateQueries"],
       update?: (
         cache: ApolloCache<TStore>,
-        result: MutationResult<TData>
+        result: MutationResult<TData>,
+        options: MutationResultOptions,
       ) => void;
     },
   ) {
