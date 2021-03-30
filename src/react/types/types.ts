@@ -148,7 +148,8 @@ export type RefetchQueriesFunction = (
 
 export interface BaseMutationOptions<
   TData = any,
-  TVariables = OperationVariables
+  TVariables = OperationVariables,
+  TContext = Context,
 > {
   variables?: TVariables;
   optimisticResponse?: TData | ((vars: TVariables) => TData);
@@ -158,7 +159,7 @@ export interface BaseMutationOptions<
   update?: MutationUpdaterFn<TData>;
   client?: ApolloClient<object>;
   notifyOnNetworkStatusChange?: boolean;
-  context?: Context;
+  context?: TContext;
   onCompleted?: (data: TData) => void;
   onError?: (error: ApolloError) => void;
   fetchPolicy?: Extract<WatchQueryFetchPolicy, 'no-cache'>;
@@ -195,13 +196,14 @@ export declare type MutationFunction<
 
 export interface MutationHookOptions<
   TData = any,
-  TVariables = OperationVariables
-> extends BaseMutationOptions<TData, TVariables> {
+  TVariables = OperationVariables,
+  TContext = Context,
+> extends BaseMutationOptions<TData, TVariables, TContext> {
   mutation?: DocumentNode | TypedDocumentNode<TData, TVariables>;
 }
 
-export interface MutationDataOptions<TData = any, TVariables = OperationVariables>
-  extends BaseMutationOptions<TData, TVariables> {
+export interface MutationDataOptions<TData = any, TVariables = OperationVariables, TContext = Context>
+  extends BaseMutationOptions<TData, TVariables, TContext> {
   mutation: DocumentNode | TypedDocumentNode<TData, TVariables>;
 }
 

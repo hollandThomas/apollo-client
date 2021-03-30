@@ -2,14 +2,14 @@ import { useContext, useState, useRef, useEffect } from 'react';
 import { DocumentNode } from 'graphql';
 import { TypedDocumentNode } from '@graphql-typed-document-node/core';
 
-import { MutationHookOptions, MutationTuple } from '../types/types';
+import { MutationHookOptions, MutationTuple, Context } from '../types/types';
 import { MutationData } from '../data';
 import { OperationVariables } from '../../core';
 import { getApolloContext } from '../context';
 
-export function useMutation<TData = any, TVariables = OperationVariables>(
+export function useMutation<TData = any, TVariables = OperationVariables, TContext = Context>(
   mutation: DocumentNode | TypedDocumentNode<TData, TVariables>,
-  options?: MutationHookOptions<TData, TVariables>
+  options?: MutationHookOptions<TData, TVariables, TContext>
 ): MutationTuple<TData, TVariables> {
   const context = useContext(getApolloContext());
   const [result, setResult] = useState({ called: false, loading: false });
